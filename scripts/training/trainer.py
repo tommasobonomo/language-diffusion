@@ -16,7 +16,7 @@ class CustomSaveConfigCallback(SaveConfigCallback):
         self,
         parser: LightningArgumentParser,
         config: Namespace | Any,
-        config_filename: str = "config.yaml",
+        config_filename: str = "cli_config.yaml",
         overwrite: bool = False,
         multifile: bool = False,
         save_to_log_dir: bool = False,
@@ -28,29 +28,16 @@ class CustomSaveConfigCallback(SaveConfigCallback):
     def save_config(
         self, trainer: Trainer, pl_module: LightningModule, stage: str
     ) -> None:
-        if trainer.logger is not None and stage == "fit":
+        if len(trainer.loggers) > 0 and stage == "fit":
             wandb_loggers = [
                 logger for logger in trainer.loggers if isinstance(logger, WandbLogger)
             ]
             if len(wandb_loggers) > 0:
                 wandb_logger = wandb_loggers[0]
-                # Write to wandb logging folder if it is a wandb logger
-                wandb_logger.experiment.config.update(self.config)
-                config_path = (
-                    Path("logs")
-                    / wandb_logger.experiment.name
-                    / (
-                        wandb_logger.version
-                        if isinstance(wandb_logger.version, str)
-                        else str(wandb_logger.version)
-                    )
-                    / "config.yaml"
+                config_path = Path(wandb_logger.experiment.dir) / self.config_filename
+                config_path.write_text(
+                    self.parser.dump(self.config, skip_none=False, yaml_comments=True)
                 )
-                config_path.parent.mkdir(parents=True, exist_ok=True)
-                config = self.parser.dump(
-                    self.config, skip_none=False, yaml_comments=True
-                )
-                config_path.write_text(config)
 
 
 def run():

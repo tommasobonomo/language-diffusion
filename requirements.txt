@@ -1,6 +1,11 @@
 datasets==2.14.6
+evaluate==0.4.1
+jsonargparse==4.27.0
 lightning==2.1.0
+rich==13.6.0
+ruyaml==0.91.0
 torch==2.1.0
 transformers==4.34.1
 typed-argument-parser==1.8.1
+wandb==0.16.0
 wasabi==1.1.2

@@ -1,0 +1,35 @@
+# Trainer config
+trainer:
+  #   (type: int, default: 100_000)
+  max_steps: 50_000
+
+  precision: 16-true # Can be bf16-true on supported GPUs
+
+  logger:
+  - class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      name: bart-base
+      project: language-diffusion
+      log_model: false
+      save_dir: logs
+
+
+# Model configuration
+model:
+
+  # Model class path
+  class_path: src.model.bart.BartBaseline
+  init_args:
+    transformer_name: facebook/bart-base
+    learning_rate: 5e-05
+    weight_decay: 0.01
+
+# Data configuration
+data:
+
+  # Data class 
+  class_path: src.data.HFDataModule
+  init_args:
+    tokenizer_name: facebook/bart-base
+    batch_size: 32
+    num_workers: 4

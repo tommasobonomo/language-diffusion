@@ -1,0 +1,48 @@
+# lightning.pytorch==2.1.1
+
+# Seed for reproducibility
+seed_everything: 7829
+
+# Trainer configuration
+trainer:
+  # Hardware selection
+  accelerator: auto
+  devices: auto
+
+  # Fast dev run
+  fast_dev_run: false
+
+  # Max steps
+  max_steps: 100_000
+  
+  # Gradient accumulation
+  accumulate_grad_batches: 1
+
+  # Default callbacks
+  callbacks:
+  - class_path: lightning.pytorch.callbacks.RichProgressBar
+  - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+  - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+    init_args:
+      monitor: val/rougeLsum
+      mode: max
+      save_top_k: 1
+      save_last: true
+      filename: "{epoch:02d}-{val/rougeLsum:.4f}"
+
+
+# One or more arguments specifying "class_path" and "init_args" for any subclass of lightning.LightningModule. (type: <class 'LightningModule'>, known subclasses: lightning.LightningModule, src.model.bart.BartBaseline)
+model:
+  class_path: src.model.bart.BartBaseline
+  init_args:
+    transformer_name: facebook/bart-base
+    learning_rate: 3.0e-05
+    weight_decay: 0.0
+
+# One or more arguments specifying "class_path" and "init_args" for any subclass of lightning.LightningDataModule. (type: <class 'LightningDataModule'>, known subclasses: lightning.LightningDataModule, src.data.HFDataModule)
+data:
+  class_path: src.data.HFDataModule
+  init_args:
+    tokenizer_name: facebook/bart-base
+    batch_size: 32
+    num_workers: 4

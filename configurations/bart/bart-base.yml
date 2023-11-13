@@ -3,7 +3,7 @@ trainer:
   #   (type: int, default: 100_000)
   max_steps: 50_000
 
-  precision: 16-true # Can be bf16-true on supported GPUs
+  precision: 16-mixed # Can be bf16-mixed on supported GPUs
 
   logger:
   - class_path: lightning.pytorch.loggers.WandbLogger

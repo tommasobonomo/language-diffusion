@@ -14,7 +14,7 @@ class BartBaseline(LightningModule):
     def __init__(
         self,
         transformer_name: str = "facebook/bart-base",
-        learning_rate: float = 3e-5,
+        learning_rate: float = 5e-5,
         weight_decay: float = 0.0,
         generation_config: GenerationConfig | None = None,
     ):
@@ -46,6 +46,7 @@ class BartBaseline(LightningModule):
         # Reduce on plateau scheduler
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
+            patience=1,
             mode="min",
             verbose=True,
         )
@@ -70,7 +71,7 @@ class BartBaseline(LightningModule):
         input_ids = batch.input_ids
         attention_mask = batch.attention_mask
         labels = batch.get("labels", None)
-        outputs = self.model(input_ids, attention_mask=attention_mask, labels=labels)  # type: ignore
+        outputs = self.model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)  # type: ignore
         return outputs
 
     def _predict(self, batch: BatchEncoding) -> torch.Tensor:

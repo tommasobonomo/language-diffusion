@@ -1,8 +1,11 @@
+absl-py==2.0.0
 datasets==2.14.6
 evaluate==0.4.1
-jsonargparse==4.27.0
+jsonargparse[signatures]==4.27.0
 lightning==2.1.0
+nltk==3.8.1
 rich==13.6.0
+rouge-score==0.1.2
 ruyaml==0.91.0
 torch==2.1.0
 transformers==4.34.1

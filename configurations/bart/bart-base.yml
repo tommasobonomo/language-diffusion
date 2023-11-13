@@ -1,9 +1,9 @@
 # Trainer config
 trainer:
   #   (type: int, default: 100_000)
-  max_steps: 50_000
+  max_steps: 100_000
 
-  precision: 16-mixed # Can be bf16-mixed on supported GPUs
+  precision: bf16-mixed # Can be bf16-mixed on supported GPUs
 
   logger:
   - class_path: lightning.pytorch.loggers.WandbLogger
@@ -31,5 +31,5 @@ data:
   class_path: src.data.HFDataModule
   init_args:
     tokenizer_name: facebook/bart-base
-    batch_size: 32
+    batch_size: 16
     num_workers: 4

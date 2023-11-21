@@ -25,6 +25,9 @@ class CustomSaveConfigCallback(SaveConfigCallback):
             parser, config, config_filename, overwrite, multifile, save_to_log_dir
         )
 
+    def add_arguments_to_parser(self, parser: LightningArgumentParser):
+        parser.link_arguments("trainer.num_training_steps", "model.num_training_steps")
+
     def save_config(
         self, trainer: Trainer, pl_module: LightningModule, stage: str
     ) -> None:

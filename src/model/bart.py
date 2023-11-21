@@ -8,6 +8,7 @@ from transformers import (
     GenerationConfig,
 )
 from transformers.modeling_outputs import Seq2SeqLMOutput
+from transformers.optimization import get_linear_schedule_with_warmup
 
 
 class BartBaseline(LightningModule):
@@ -17,6 +18,7 @@ class BartBaseline(LightningModule):
         learning_rate: float = 5e-5,
         weight_decay: float = 0.0,
         generation_config: GenerationConfig | None = None,
+        num_training_steps: int = 100_000,
     ):
         super().__init__()
         # Initialise model and tokenizer (needed for metrics)
@@ -26,6 +28,7 @@ class BartBaseline(LightningModule):
         # Save hyperparameters
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
+        self.num_training_steps = num_training_steps
 
         # Initialise metrics module
         self.rouge_metric = evaluate.load("rouge")
@@ -43,12 +46,9 @@ class BartBaseline(LightningModule):
             lr=self.learning_rate,
             weight_decay=self.weight_decay,
         )
-        # Reduce on plateau scheduler
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer,
-            patience=1,
-            mode="min",
-            verbose=True,
+        # Linear schedule with no warmup
+        scheduler = get_linear_schedule_with_warmup(
+            optimizer, num_warmup_steps=0, num_training_steps=100_000
         )
         return {
             "optimizer": optimizer,

@@ -17,6 +17,7 @@ class BartBaseline(LightningModule):
         transformer_name: str = "facebook/bart-base",
         learning_rate: float = 5e-5,
         weight_decay: float = 0.0,
+        exclude_params: list[str] = ["bias", "layer_norm.weight"],
         generation_config: GenerationConfig | None = None,
         num_training_steps: int = 100_000,
     ):
@@ -28,6 +29,7 @@ class BartBaseline(LightningModule):
         # Save hyperparameters
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
+        self.exclude_params = exclude_params
         self.num_training_steps = num_training_steps
 
         # Initialise metrics module
@@ -41,6 +43,25 @@ class BartBaseline(LightningModule):
 
     def configure_optimizers(self):
         # Optimizer
+        grouped_parameters = [
+            {
+                "params": [
+                    p
+                    for n, p in self.model.named_parameters()
+                    if not any(nd in n for nd in self.exclude_params)
+                ],
+                "weight_decay": self.weight_decay,
+            },
+            {
+                "params": [
+                    p
+                    for n, p in self.model.named_parameters()
+                    if any(nd in n for nd in self.exclude_params)
+                ],
+                "weight_decay": 0.0,
+            },
+        ]
+
         optimizer = torch.optim.RAdam(
             self.parameters(),
             lr=self.learning_rate,

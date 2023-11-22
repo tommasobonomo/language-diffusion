@@ -5,12 +5,17 @@ trainer:
 
   precision: bf16-mixed # Can be bf16-mixed on supported GPUs
 
+  accumulate_grad_batches: 3
+
+  # Run validation every half epoch
+  val_check_interval: 0.5
+
   logger:
   - class_path: lightning.pytorch.loggers.WandbLogger
     init_args:
       name: bart-base
       project: language-diffusion
-      log_model: false
+      log_model: true
       save_dir: logs
 
 
@@ -21,8 +26,9 @@ model:
   class_path: src.model.bart.BartBaseline
   init_args:
     transformer_name: facebook/bart-base
-    learning_rate: 5e-05
+    learning_rate: 5e-07
     weight_decay: 0.01
+    exclude_params: ["layer_norm.weight", "bias"]
 
 # Data configuration
 data:
@@ -31,5 +37,5 @@ data:
   class_path: src.data.HFDataModule
   init_args:
     tokenizer_name: facebook/bart-base
-    batch_size: 16
+    batch_size: 4
     num_workers: 4
